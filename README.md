@@ -37,7 +37,7 @@ To create a customized version you first need to run the image with certain para
 To make it as easy as possible I wrote a script, you can download:
 
 ```
-~$ wget https://raw.githubusercontent.com/FoseFx/gmod-server-docker/master/run.sh
+~$ wget https://raw.githubusercontent.com/FoseFx/Idiot-proof-ttt-server-setup-docker/master/run.sh
 ~$ chmod +x run.s
 ```
 
@@ -140,7 +140,7 @@ you just have to reinstall Docker, login and start the server.
 
 ```
 ~$ sudo apt-get install docker.io wget
-~$ wget https://raw.githubusercontent.com/FoseFx/gmod-server-docker/master/run.sh
+~$ wget https://raw.githubusercontent.com/FoseFx/Idiot-proof-ttt-server-setup-docker/master/run.sh
 ~$ chmod +x run.s
 ```
 
