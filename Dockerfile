@@ -12,11 +12,17 @@ WORKDIR /steamcmd
 RUN wget http://media.steampowered.com/installer/steamcmd_linux.tar.gz
 RUN tar -xvzf steamcmd_linux.tar.gz
 RUN mkdir /gmod-base
+
+RUN useradd steam
+RUN chown -R steam /steamcmd /gmod-base
+USER steam
+
 RUN /steamcmd/steamcmd.sh +login anonymous +force_install_dir /gmod-base +app_update 4020 validate +quit
 
 # ----------------
 # Annoying lib fix
 # ----------------
+USER root
 
 RUN mkdir /gmod-libs
 WORKDIR /gmod-libs
@@ -27,9 +33,8 @@ WORKDIR /
 RUN rm -rf /gmod-libs
 RUN cp /steamcmd/linux32/libstdc++.so.6 /gmod-base/bin/
 
-RUN mkdir -p /root/.steam
-RUN mkdir -p /root/.steam/sdk32/
-RUN cp -a /steamcmd/linux32/. /root/.steam/sdk32/
+RUN mkdir -p /home/steam/.steam/sdk32/
+RUN cp -a /steamcmd/linux32/. /home/steam/.steam/sdk32/
 # RUN cp /gmod-base/bin/libsteam.so /root/.steam/sdk32
 
 # ----------------------
@@ -40,20 +45,23 @@ RUN mkdir /gmod-volume
 VOLUME /gmod-volume
 # RUN mkdir /gmod-union
 # RUN DEBIAN_FRONTEND=noninteractive apt-get -y install unionfs-fuse
-
+RUN chown -R steam /gmod-volume /gmod-base /steamcmd /home/steam
 # ---------------
 # Setup Container
 # ---------------
 
 ADD start-server.sh /start-server.sh
 EXPOSE 27015/udp
+EXPOSE 27015/tcp
+EXPOSE 27005/udp
+EXPOSE 27006/tcp
 
 ENV PORT="27015"
 ENV MAXPLAYERS="16"
 ENV G_HOSTNAME="Garry's Mod"
 ENV GAMEMODE="terrortown"
 ENV MAP="gm_construct"
-# ENV HOST_WORKSHOP_COLLECTION = ""
-# ENV AUTHKEY = "nah"
-
+ENV HOST_WORKSHOP_COLLECTION = ""
+ENV AUTHKEY = ""
+USER steam
 CMD ["/bin/sh", "/start-server.sh"]
