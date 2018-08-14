@@ -13,7 +13,7 @@ You can also create your own.
 
 # Your first start
 
-You can use [this Guide](https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers) to set up a safe server.
+You can use [this Guide](https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers) to set up a safe server. Keep in mind that you have to allow ports 27015 and 27005.
 
 Now that you have a secure server we can start. SSH on the server and [install docker](https://docs.docker.com/install/)
 and wget:
