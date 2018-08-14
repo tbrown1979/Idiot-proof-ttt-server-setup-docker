@@ -2,8 +2,6 @@ gmod-server-docker
 ==================
 (Fork)
 
-(Fork)
-
 This is a set of Dockerfile and scripts that will create a container that runs a [Garry's Mod](http://www.garrysmod.com/) Server. 
 
 The container optionally uses [unionfs-fuse](https://github.com/rpodgorny/unionfs-fuse) to make a union filesystem layering `/gmod-volume` over `/gmod-base`, where the server is installed. 
