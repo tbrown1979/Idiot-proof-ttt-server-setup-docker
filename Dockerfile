@@ -1,12 +1,12 @@
 FROM debian:wheezy
 
-MAINTAINER Suchipi Izumi "me@suchipi.com"
-
 # ------------
 # Prepare Gmod
 # ------------
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install lib32gcc1 wget
+# RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install lib32gcc1 wget
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y ca-certificates lib32tinfo5 lib32gcc1 net-tools lib32stdc++6 lib32z1 lib32z1-dev wget
+RUN update-ca-certificates
 RUN mkdir /steamcmd
 WORKDIR /steamcmd
 RUN wget http://media.steampowered.com/installer/steamcmd_linux.tar.gz
@@ -22,14 +22,15 @@ RUN mkdir /gmod-libs
 WORKDIR /gmod-libs
 RUN wget http://launchpadlibrarian.net/195509222/libc6_2.15-0ubuntu10.10_i386.deb
 RUN dpkg -x libc6_2.15-0ubuntu10.10_i386.deb .
-RUN cp lib/i386-linux-gnu/* /gmod-base/bin/
+RUN cp -a lib/i386-linux-gnu/. /gmod-base/bin/
 WORKDIR /
 RUN rm -rf /gmod-libs
 RUN cp /steamcmd/linux32/libstdc++.so.6 /gmod-base/bin/
 
-RUN mkdir /root/.steam
-RUN mkdir /root/.steam/sdk32/
-RUN cp /gmod-base/bin/libsteam.so /root/.steam/sdk32
+RUN mkdir -p /root/.steam
+RUN mkdir -p /root/.steam/sdk32/
+RUN cp -a /steamcmd/linux32/. /root/.steam/sdk32/
+# RUN cp /gmod-base/bin/libsteam.so /root/.steam/sdk32
 
 # ----------------------
 # Setup Volume and Union
@@ -37,8 +38,8 @@ RUN cp /gmod-base/bin/libsteam.so /root/.steam/sdk32
 
 RUN mkdir /gmod-volume
 VOLUME /gmod-volume
-RUN mkdir /gmod-union
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install unionfs-fuse
+# RUN mkdir /gmod-union
+# RUN DEBIAN_FRONTEND=noninteractive apt-get -y install unionfs-fuse
 
 # ---------------
 # Setup Container
@@ -50,7 +51,9 @@ EXPOSE 27015/udp
 ENV PORT="27015"
 ENV MAXPLAYERS="16"
 ENV G_HOSTNAME="Garry's Mod"
-ENV GAMEMODE="sandbox"
+ENV GAMEMODE="terrortown"
 ENV MAP="gm_construct"
+# ENV HOST_WORKSHOP_COLLECTION = ""
+# ENV AUTHKEY = "nah"
 
 CMD ["/bin/sh", "/start-server.sh"]
