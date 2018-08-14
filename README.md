@@ -1,33 +1,156 @@
-gmod-server-docker
-==================
-(Fork)
+Idiot-proof TTT linux Server installation using Docker
+===================================
+Supporting Addons using Steam collections
 
-This is a set of Dockerfile and scripts that will create a container that runs a [Garry's Mod](http://www.garrysmod.com/) Server. 
+## Before you begin
 
-The container optionally uses [unionfs-fuse](https://github.com/rpodgorny/unionfs-fuse) to make a union filesystem layering `/gmod-volume` over `/gmod-base`, where the server is installed. 
-`/gmod-volume` is exposed as a docker volume. 
-This allows you to customize the server and/or run multiple servers with different configs without needing a copy of the (~3GB) base server for each one. 
-Any file you put in `/gmod-volume` will override the files in `/gmod-base`, and attempting to write to any file in `/gmod-base` that doesn't exist in `/gmod-volume` will instead copy it to `/gmod-volume` and make the changes there (Copy-On-Write). 
-You can also create a `start-server.sh` in the volume to customize what happens when the server is started (for instance, you may want to automatically update it, or use a more sophisticated crash detection system).
+1. Go to the [Steam Workshop](https://steamcommunity.com/workshop/browse/?appid=4000&searchtext=ttt&childpublishedfileid=0&browsesort=trend&section=collections) and choose a collection you like.
+You can also create your own.
 
-Using unionfs-fuse requires the container to be run with `--privileged=true` and the environment variable `UNION` to be set. 
+2. Get an [Steam API Key](https://steamcommunity.com/dev/apikey) by entering anything to the Domain Field. (Email/Server IP or like, an actual domain that isn't in use already)
 
-#### Examples
+3. Get a Server with a linux installed on it (I'm using debian in this example).
 
-Start a server on port 27015 without using the union filesystem:
+# Your first start
 
-`docker run -d -p 27015:27015/udp suchipi/gmod-server`
+You can use [this Guide](https://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers) to set up a safe server.
 
-Start a server on an automatically allocated port, mounting the contents of /home/srcds/gmod-1 over the internal base:
-
-`docker run --privileged=true -d -P -e UNION=1 -v /home/srcds/gmod-1:/gmod-volume suchipi/gmod-server`
+Now that you have a secure server we can start. SSH on the server and [install docker](https://docs.docker.com/install/)
+and wget:
 
 
-#### Notes/Todo
-You can set the environment variables MAXPLAYERS, MAP, GAMEMODE, G_HOSTNAME, and ARGS to change the startup arguments to the srcds_run command. For example:
+```
+~$ sudo apt-get install docker.io wget
+```
 
-`docker run -d -P -e MAXPLAYERS=32 -e MAP=gm_flatgrass -e GAMEMODE=my_cool_gamemode -e G_HOSTNAME="My awesome gmod server" -e ARGS="-insecure +exec something.cfg" suchipi/gmod-server`
+I encourage you to find you more about Docker!
 
-The Source Engine doesn't seem to find out which port it's *actually* running on, so it tells the master servers that it's running on 27015 (or whatever `-port` you specified at runtime) even if you assign with `-p` dynamically. I've explored several potential solutions to this but the bottom line is that the Source Engine Dedicated Server wasn't really set up with this type of NATing in mind (or maybe, for that matter, any type of NAT). If you want this piece to work properly, you should probably just use the same port on the docker host as within the container.
+Now download my clean TTT image:
 
-`build.sh` and `run.sh` are just convenience scripts; they aren't used by the Dockerfile.
+```
+~$ sudo docker pull fosefx/ttt-server
+```
+
+It's 8GB+ big, so this might take a while
+
+To create a customized version you first need to run the image with certain parameters.
+To make it as easy as possible I wrote a script, you can download:
+
+```
+~$ wget https://raw.githubusercontent.com/FoseFx/gmod-server-docker/master/run.sh
+~$ chmod +x run.s
+```
+
+First get the image's id using
+```
+~$ sudo docker images
+```
+And copy it. Now execute the script.
+```
+~$ sudo sh run.sh <imageID> <your API Key> <your collection's ID>
+```
+
+You can find your collections ID at the end of it's URL (`https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX`)
+
+Now this will take a while, depending on the amount of addons that need to be downloaded to the server.
+
+
+When the last line prints something with `VAC` you can close the server again using `Ctrl + C`
+
+## Change the config files
+At this point in time you can edit the config files which are now in the following directory:
+
+`/var/lib/docker/volumes/garrysmod/_data`
+(you can change your directory using the `cd` command, `cd ..` will elevate you one folder level)
+
+You can find examples all over the internet.
+
+## Add Workshop.lua
+
+Now locate this folder:
+
+`/var/lib/docker/volumes/garrysmod/_data/lua/autorun/server`
+
+And create a `workshop.lua` (`sudo touch /var/lib/docker/volumes/garrysmod/_data/lua/autorun/server/workshop.lua`).
+Here you have to copy the output of [this generator in](https://csite.io/tools/gmod-universal-workshop).
+
+
+(`cd ~` after that)
+##Create a unique image
+
+Create a [dockerhub](https://hub.docker.com) account and `sudo docker login` with your credentials.
+
+Your Container should be listed here: `sudo docker container list -a`.
+
+To create a unique image for your configuration type
+
+```
+~$ sudo docker commit <CONTAINER ID> <dockerhub username>/<some name>
+```
+
+Now push it to the docker hub where you can pull it from anytime.
+```
+~$ sudo docker push <dockerhub username>/<some name>
+```
+
+## Cleaning
+
+1. Stop and remove the 'old' container
+    - `sudo docker stop <containerID>`
+    - `sudo docker rm <containerID>`
+2. Remove the old image
+    - get the image `sudo docker images`
+    - remove it `sudo docker rmi <image ID>`
+3. Remove the old Volume
+    - `sudo docker volume rm garrysmod`
+4. Start new Container
+    - `sudo sh run.sh <new image's ID>`
+    
+## Attach
+
+See nothing? That's good. The container is not in 'detached mode'. 
+To interact with the console use
+```
+~$ sudo docker ps
+~$ sudo docker attach <container ID>
+```
+###READ THIS FIRST!
+Using `Ctrl + C` you will `Stop the server`!
+When you want to detach from the container without stopping it use:
+`Ctrl + P` followed by `Ctrl + Q`.
+
+When you see your bash input you are safe to `exit`, the server will stay!
+
+When the Server stopped you can restart it using
+```
+~$ sudo docker container -a
+~$ sudo docker restart <image>
+```
+
+You can remove all containers using
+```
+sudo docker rm $(docker container list -q)
+```
+
+# Redeploy
+
+So your server shut down or you want to start another one.
+Because you now have a unique Docker Image uploaded to DockerHub
+you just have to reinstall Docker, login and start the server.
+
+```
+~$ sudo apt-get install docker.io wget
+~$ wget https://raw.githubusercontent.com/FoseFx/gmod-server-docker/master/run.sh
+~$ chmod +x run.s
+```
+
+Now use `docker login` again to login and then 
+``` 
+~$ sudo docker pull <dockerhub username>/<some name>
+```
+
+Start the server with `sudo sh run.sh <image ID>` and your done.
+
+
+This Guide is based on [this repository](https://github.com/suchipi/gmod-server-docker/)
+
