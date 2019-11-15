@@ -108,7 +108,7 @@ Now push it to the docker hub where you can pull it from anytime.
     
 ## Attach
 
-See nothing? That's good. The container is not in 'detached mode'. 
+See nothing? That's good. The container is now in 'detached mode'. 
 To interact with the console use
 ```
 ~$ sudo docker ps
