@@ -38,7 +38,7 @@ To make it as easy as possible I wrote a script, you can download:
 
 ```
 ~$ wget https://raw.githubusercontent.com/FoseFx/Idiot-proof-ttt-server-setup-docker/master/run.sh
-~$ chmod +x run.s
+~$ chmod +x run.sh
 ```
 
 First get the image's id using
@@ -76,7 +76,7 @@ Here you have to copy the output of [this generator in](https://csite.io/tools/g
 
 
 (`cd ~` after that)
-##Create a unique image
+## Create a unique image
 
 Create a [dockerhub](https://hub.docker.com) account and `sudo docker login` with your credentials.
 
@@ -108,13 +108,13 @@ Now push it to the docker hub where you can pull it from anytime.
     
 ## Attach
 
-See nothing? That's good. The container is not in 'detached mode'. 
+See nothing? That's good. The container is now in 'detached mode'. 
 To interact with the console use
 ```
 ~$ sudo docker ps
 ~$ sudo docker attach <container ID>
 ```
-###READ THIS FIRST!
+### READ THIS FIRST!
 Using `Ctrl + C` you will `Stop the server`!
 When you want to detach from the container without stopping it use:
 `Ctrl + P` followed by `Ctrl + Q`.
