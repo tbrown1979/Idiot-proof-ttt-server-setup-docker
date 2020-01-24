@@ -23,7 +23,7 @@ and wget:
 ~$ sudo apt-get install docker.io wget
 ```
 
-I encourage you to find you more about Docker!
+I encourage you to find out more about Docker!
 
 Now download my clean TTT image:
 
@@ -52,7 +52,7 @@ And copy it. Now execute the script.
 
 You can find your collections ID at the end of it's URL (`https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX`)
 
-Now this will take a while, depending on the amount of addons that need to be downloaded to the server.
+Now this will take a while, depending on the amount of addons that needs to be downloaded to the server.
 
 
 When the last line prints something with `VAC` you can close the server again using `Ctrl + C`
@@ -61,7 +61,7 @@ When the last line prints something with `VAC` you can close the server again us
 At this point in time you can edit the config files which are now in the following directory:
 
 `/var/lib/docker/volumes/garrysmod/_data`
-(you can change your directory using the `cd` command, `cd ..` will elevate you one folder level)
+(you can change your directory using the `cd` command, `cd ..` will elevate you one folder level, note: `/var/lib/docker` probably needs to be accessed by the `root` user, use `sudo -s` to become root first)
 
 You can find examples all over the internet.
 
@@ -72,17 +72,18 @@ Now locate this folder:
 `/var/lib/docker/volumes/garrysmod/_data/lua/autorun/server`
 
 And create a `workshop.lua` (`sudo touch /var/lib/docker/volumes/garrysmod/_data/lua/autorun/server/workshop.lua`).
-Here you have to copy the output of [this generator in](https://csite.io/tools/gmod-universal-workshop).
-
+Here you have to copy the output of [this generator in](https://csite.io/tools/gmod-universal-workshop) into.
+[You don't know how to edit a file from the terminal? Here is a guide on nano.][how-to-nano]
 
 (`cd ~` after that)
+
 ## Create a unique image
 
 Create a [dockerhub](https://hub.docker.com) account and `sudo docker login` with your credentials.
 
 Your Container should be listed here: `sudo docker container list -a`.
 
-To create a unique image for your configuration type
+To create an unique image for your configuration type
 
 ```
 ~$ sudo docker commit <CONTAINER ID> <dockerhub username>/<some name>
@@ -134,7 +135,7 @@ sudo docker rm $(docker container list -q)
 
 # Redeploy
 
-So your server shut down or you want to start another one.
+So your server died or you want to start another one.
 Because you now have a unique Docker Image uploaded to DockerHub
 you just have to reinstall Docker, login and start the server.
 
@@ -151,6 +152,13 @@ Now use `docker login` again to login and then
 
 Start the server with `sudo sh run.sh <image ID>` and your done.
 
+# Auto-restart
+
+Docker will not restart containers if your system goes down, however you can tell it to do so.
+When you start the container use the `--restart unless-stopped` argument. (More here)[docker-always-restart].
+You can add this flag to running containers using `docker update --restart unless-stopped <CONTAINER_ID>`.
 
 This Guide is based on [this repository](https://github.com/suchipi/gmod-server-docker/)
 
+[how-to-nano]: https://www.howtogeek.com/howto/42980/the-beginners-guide-to-nano-the-linux-command-line-text-editor/
+[docker-always-restart]: https://docs.docker.com/config/containers/start-containers-automatically/
