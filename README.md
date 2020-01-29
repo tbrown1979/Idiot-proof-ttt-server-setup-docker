@@ -155,7 +155,7 @@ Start the server with `sudo sh run.sh <image ID>` and your done.
 # Auto-restart
 
 Docker will not restart containers if your system goes down, however you can tell it to do so.
-When you start the container use the `--restart unless-stopped` argument. (More here)[docker-always-restart].
+When you start the container use the `--restart unless-stopped` argument. [More here][docker-always-restart].
 You can add this flag to running containers using `docker update --restart unless-stopped <CONTAINER_ID>`.
 
 This Guide is based on [this repository](https://github.com/suchipi/gmod-server-docker/)
