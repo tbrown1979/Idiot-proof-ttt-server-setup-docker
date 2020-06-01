@@ -49,7 +49,7 @@ And copy it. Now execute the script.
 ```
 ~$ sudo sh run.sh <imageID> <your API Key> <your collection's ID>
 ```
-
+ex collection Id: `184346376`
 You can find your collections ID at the end of it's URL (`https://steamcommunity.com/sharedfiles/filedetails/?id=XXXXXXXXXX`)
 
 Now this will take a while, depending on the amount of addons that needs to be downloaded to the server.
